@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Note;
+use App\User;
 use Illuminate\Http\Request;
 
 class NoteController extends Controller
@@ -10,80 +11,38 @@ class NoteController extends Controller
     public function __construct() {
         $this->middleware('auth');
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-        return view('notes');
+
+    public function index() {
+        return view('home');
+    }
+    
+    public function showall() {
+        $notes = Note::where('user_id', '=', auth()->id())->orderBy('created_at', 'desc')->get();
+        return $notes;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
+        $note = new Note;
+        $note->label = "Notes";
+        $note->user_id = auth()->id();
+        $note->title = $request->title;
+        $note->note = $request->note;
+        $note->image = "ImageSample";
+        $note->save();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Note $note)
-    {
-        //
+    public function editshow($id) {
+        $note = Note::findOrFail($id);
+        return $note;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Note $note)
-    {
-        //
+    public function updateNote(Request $request, $id) {
+        $note = Note::findOrFail($id);
+        $note->title = $request->title;
+        $note->note = $request->note;
+        $note->save();
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Note $note)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Note  $note
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Note $note)
-    {
-        //
-    }
 }

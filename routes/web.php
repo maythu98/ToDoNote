@@ -11,11 +11,16 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Auth::routes();
 
-Route::get('/', 'HomeController@index')->name('home');
+Route::get('/', 'NoteController@index');
+// Route::get('/index/{first_param?}', 'NoteController@index');
+Route::post('/store', 'NoteController@store');
+Route::get('/show', 'NoteController@showall');
+Route::get('/editshow/{id}', 'NoteController@editshow');
+Route::post('/updateNote/{id}', 'NoteController@updateNote');
 
