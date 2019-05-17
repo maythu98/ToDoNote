@@ -1853,6 +1853,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -1860,10 +1863,11 @@ __webpack_require__.r(__webpack_exports__);
       formDetail: false,
       rows: 1,
       RowNumber: 2,
-      noteDetail: false,
       notes: [],
       editNote: [],
-      note_id: ''
+      note_id: '',
+      images: [],
+      files: []
     };
   },
   methods: {
@@ -1875,21 +1879,41 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios.get('/show').then(function (response) {
+        response.data.forEach(function (element) {
+          element.image = JSON.parse(element.image);
+        });
         _this.notes = response.data;
       });
+    },
+    // Image
+    onFileChange: function onFileChange(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+      this.createImage(files[0]);
+    },
+    createImage: function createImage(file) {
+      var reader = new FileReader();
+      var vm = this;
+
+      reader.onload = function (e) {
+        vm.images.push(e.target.result);
+      };
+
+      reader.readAsDataURL(file);
     },
     SaveNote: function SaveNote() {
       var _this2 = this;
 
       axios.post('/store', {
         title: this.$refs.NoteTitle.value,
-        note: this.$refs.NoteContent.value
+        note: this.$refs.NoteContent.value,
+        images: this.images
       }).then(function (response) {
-        _this2.formDetail = false;
+        _this2.showall();
+
+        _this2.images = [];
         _this2.$refs.NoteTitle.value = "";
         _this2.$refs.NoteContent.value = "";
-
-        _this2.showall();
       });
     },
     noteEdit: function noteEdit(id) {
@@ -1916,11 +1940,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     noteOver: function noteOver(id) {
       this.note_id = id;
-      this.noteDetail = true;
     },
     noteLeave: function noteLeave() {
       this.note_id = '';
-      this.noteDetail = false;
     }
   },
   mounted: function mounted() {
@@ -38044,6 +38066,27 @@ var render = function() {
   return _c("div", { staticClass: "container" }, [
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "col-md-7 shadow p-3 mb-5 bg-white rounded" }, [
+        _c(
+          "div",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.formDetail,
+                expression: "formDetail"
+              }
+            ]
+          },
+          _vm._l(_vm.images, function(image) {
+            return _c("img", {
+              staticClass: "img-fluid pb-2",
+              attrs: { name: _vm.files, src: image }
+            })
+          }),
+          0
+        ),
+        _vm._v(" "),
         _c("div", { staticClass: "form-group" }, [
           _c("input", {
             directives: [
@@ -38087,13 +38130,27 @@ var render = function() {
             ]
           },
           [
-            _c("i", { staticClass: "far fa-image fa-2x" }),
-            _vm._v(" "),
             _c("input", {
-              attrs: { type: "file", name: "image" },
-              on: { click: _vm.fileUpload }
-            }),
-            _vm._v(" "),
+              attrs: { type: "file" },
+              on: { change: _vm.onFileChange }
+            })
+          ]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.formDetail,
+                expression: "formDetail"
+              }
+            ],
+            staticClass: "form-group pt-3"
+          },
+          [
             _c(
               "button",
               {
@@ -38115,6 +38172,7 @@ var render = function() {
           return _c(
             "div",
             {
+              key: note.id,
               staticClass: "card text-white bg-secondary m-2",
               attrs: {
                 "data-toggle": "modal",
@@ -38132,20 +38190,31 @@ var render = function() {
             },
             [
               _c("blockquote", { staticClass: "blockquote mb-0 card-body" }, [
-                _c("div", [
-                  _c("h2", [_vm._v(_vm._s(note.title))]),
-                  _vm._v(" "),
-                  _c(
-                    "p",
-                    {
-                      staticStyle: {
-                        "white-space": "pre-wrap",
-                        "word-wrap": "break-word"
-                      }
-                    },
-                    [_vm._v(_vm._s(note.note))]
-                  )
-                ])
+                _c(
+                  "div",
+                  [
+                    _vm._l(note.image, function(image) {
+                      return _c("img", {
+                        staticClass: "img-fluid",
+                        attrs: { src: "storage/images/" + image, alt: "" }
+                      })
+                    }),
+                    _vm._v(" "),
+                    _c("h2", [_vm._v(_vm._s(note.title))]),
+                    _vm._v(" "),
+                    _c(
+                      "p",
+                      {
+                        staticStyle: {
+                          "white-space": "pre-wrap",
+                          "word-wrap": "break-word"
+                        }
+                      },
+                      [_vm._v(_vm._s(note.note))]
+                    )
+                  ],
+                  2
+                )
               ])
             ]
           )

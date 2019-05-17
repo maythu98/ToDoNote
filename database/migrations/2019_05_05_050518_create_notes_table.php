@@ -18,10 +18,10 @@ class CreateNotesTable extends Migration
             $table->string('label')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->string('title')->nullable();
+            $table->string('color')->nullable();
             $table->text('note')->nullable();
-            $table->string('image')->nullable();
+            $table->json('image')->nullable();
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

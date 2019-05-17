@@ -2,6 +2,9 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-7 shadow p-3 mb-5 bg-white rounded">
+				<div v-show="formDetail">
+					<img v-for="image in images" :name="files" :src="image" class="img-fluid pb-2">
+				</div>
 				<div class="form-group">
 					<input ref="NoteTitle" type="text" name="title" class="form-control" placeholder="Title" v-show="formDetail">	
 				</div>
@@ -10,8 +13,9 @@
 					placeholder="Take a note ..."></textarea>
 				</div>
 				<div v-show="formDetail">
-					<i class="far fa-image fa-2x"></i>
-					<input type="file" name="image" @click="fileUpload">
+					<input type="file" v-on:change="onFileChange">
+				</div>
+				<div v-show="formDetail" class="form-group pt-3">
 					<button @click="SaveNote" class="btn btn-secondary margin-left"> Save </button>
 				</div>
 				
@@ -19,15 +23,14 @@
 		</div>
 		<div class="row">
 			<div class="card-columns col-md-12">
-				<div class="card text-white bg-secondary m-2" data-toggle="modal" :data-target="'#form' + note_id" v-on:mouseover="noteOver(note.id)" v-on:mouseleave="noteLeave" v-for="note in notes" @click="noteEdit(note.id)">
+				<div class="card text-white bg-secondary m-2" data-toggle="modal" :data-target="'#form' + note_id" v-on:mouseover="noteOver(note.id)" v-on:mouseleave="noteLeave" v-for="note in notes" @click="noteEdit(note.id)" :key="note.id">
 					<blockquote class="blockquote mb-0 card-body">
 						<div>
+							<img v-for="image in note.image" :src="'storage/images/' + image" alt="" class="img-fluid">
+
 							<h2>{{note.title}}</h2>
 							<p style="white-space: pre-wrap; word-wrap:break-word">{{note.note}}</p>
 						</div>
-						<!-- <div v-show="noteDetail">
-							<button class="btn btn-success">Edit</button>
-						</div> -->
 					</blockquote>
 				</div>
 			</div>
@@ -61,10 +64,11 @@ import { log } from 'util';
 				formDetail: false,
 				rows: 1,
 				RowNumber: 2,
-				noteDetail: false,
 				notes: [],
 				editNote: [],
 				note_id: '',
+				images:[],
+				files: []
 			}
 		},
 		methods: {
@@ -74,18 +78,38 @@ import { log } from 'util';
 			},
 			showall() {
 				axios.get('/show').then((response)=> {
+					response.data.forEach(element => {
+						element.image = JSON.parse(element.image);
+					});
 					this.notes = response.data;
 				});
+				
 			},
+			// Image
+			onFileChange(e) {
+                let files = e.target.files || e.dataTransfer.files;
+                if (!files.length)
+                    return;
+                this.createImage(files[0]);
+            },
+            createImage(file) {
+                let reader = new FileReader();
+                let vm = this;
+                reader.onload = (e) => {
+                    vm.images.push(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
             SaveNote() {
 				axios.post('/store', {
 					title: this.$refs.NoteTitle.value,
-					note: this.$refs.NoteContent.value
-				}).then(response => {
-					this.formDetail = false;
+					note: this.$refs.NoteContent.value,
+					images: this.images,
+				}).then(response=> {
+					this.showall();
+					this.images = [];
 					this.$refs.NoteTitle.value = "";
 					this.$refs.NoteContent.value = "";
-					this.showall();
 				})
 			},
 			noteEdit(id) {
@@ -107,12 +131,10 @@ import { log } from 'util';
 			},
 			noteOver(id) {
 				this.note_id = id;
-				this.noteDetail = true;
 			},
 			noteLeave() {
 				this.note_id = '';
-				this.noteDetail = false;
-			}
+			},
 
 		},
 
