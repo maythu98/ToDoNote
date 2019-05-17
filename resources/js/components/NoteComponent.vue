@@ -3,7 +3,16 @@
 		<div class="row">
 			<div class="col-md-7 shadow p-3 mb-5 bg-white rounded">
 				<div v-show="formDetail">
-					<img v-for="image in images" :name="files" :src="image" class="img-fluid pb-2">
+					<!-- <img v-for="image in images" :name="files" :src="image" class="img-fluid pb-2"> -->
+					<div class="noteImage" v-for="image in images">
+						<img :src="image" alt="" class="img-fluid image">
+						<div class="overlay">
+							<a href="#" class="icon bottom-right" title="Delete Image">
+								<i class="fa fa-trash"></i>
+							</a>
+						</div>
+					</div>
+					<br>
 				</div>
 				<div class="form-group">
 					<input ref="NoteTitle" type="text" name="title" class="form-control" placeholder="Title" v-show="formDetail">	
@@ -13,7 +22,7 @@
 					placeholder="Take a note ..."></textarea>
 				</div>
 				<div v-show="formDetail">
-					<input type="file" v-on:change="onFileChange">
+					<input type="file" :value="file" v-on:change="onFileChange">
 				</div>
 				<div v-show="formDetail" class="form-group pt-3">
 					<button @click="SaveNote" class="btn btn-secondary margin-left"> Save </button>
@@ -27,7 +36,6 @@
 					<blockquote class="blockquote mb-0 card-body">
 						<div>
 							<img v-for="image in note.image" :src="'storage/images/' + image" alt="" class="img-fluid">
-
 							<h2>{{note.title}}</h2>
 							<p style="white-space: pre-wrap; word-wrap:break-word">{{note.note}}</p>
 						</div>
@@ -42,10 +50,30 @@
 			<div class="modal-content">
 			<div class="modal-body">
 				<div class="form-group">
+					<!-- <div class="wrapper" v-for="image in editNote.image">
+						<img :src="'storage/images/' + image" alt="" class="img-fluid">
+						<i class="fas fa-trash bottom-right"></i>
+					</div>	 -->
+					<div class="noteImage" v-for="image in editNote.image">
+						<img :src="'storage/images/' + image" alt="" class="img-fluid image">
+						<div class="overlay">
+							<a href="#" class="icon bottom-right" title="Delete Image">
+								<i class="fa fa-trash"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<img v-for="image in images" :name="files" :src="image" class="img-fluid pb-2">
+				</div>
+				<div class="form-group">
 					<input type="text" ref="UpdateTitle" name="title" :value="editNote.title" class="form-control" placeholder="Title">
 				</div>
 				<div class="form-group">
 					<textarea type="text" ref="UpdateNote" rows="5" name="note" aria-label="note" class="form-control" :value="editNote.note">	</textarea>
+				</div>
+				<div class="form-group">
+					<input type="file" v-on:change="onFileChange">
 				</div>
 			</div>
 			<div class="modal-footer">
@@ -68,7 +96,8 @@ import { log } from 'util';
 				editNote: [],
 				note_id: '',
 				images:[],
-				files: []
+				files: [],
+				file: ''
 			}
 		},
 		methods: {
@@ -82,10 +111,8 @@ import { log } from 'util';
 						element.image = JSON.parse(element.image);
 					});
 					this.notes = response.data;
-				});
-				
+				});				
 			},
-			// Image
 			onFileChange(e) {
                 let files = e.target.files || e.dataTransfer.files;
                 if (!files.length)
@@ -108,26 +135,26 @@ import { log } from 'util';
 				}).then(response=> {
 					this.showall();
 					this.images = [];
+					this.formDetail = false;
 					this.$refs.NoteTitle.value = "";
 					this.$refs.NoteContent.value = "";
 				})
 			},
 			noteEdit(id) {
 				axios.get('/editshow/' + id).then(response=> {
+					response.data.image = JSON.parse(response.data.image);
 					this.editNote = response.data;
 				})
 			},
 			noteUpdate(id) {
 				axios.post('/updateNote/' + id, {
 					title: this.$refs.UpdateTitle.value,
-					note: this.$refs.UpdateNote.value
+					note: this.$refs.UpdateNote.value,
+					images: this.images,
 				}).then(response=> {
 					this.editNote = [];
 					this.showall();
 				})
-			},
-			fileUpload() {
-				console.log('image');
 			},
 			noteOver(id) {
 				this.note_id = id;

@@ -33,7 +33,7 @@ class NoteController extends Controller
         if ($request->get('images')) {
             foreach ($request->get('images') as $image) {
                 $name = time().'.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
-                // $path = public_path('images/').$name;
+                //$path = public_path('images/').$name;
                 $source = storage_path().'/app/public/images/'. $name;
                 \Image::make($image)->fit(340, 340)->save($source);
                 $data[] = $name;
@@ -52,6 +52,15 @@ class NoteController extends Controller
         $note = Note::findOrFail($id);
         $note->title = $request->title;
         $note->note = $request->note;
+        if ($request->get('images')) {
+            foreach ($request->get('images') as $image) {
+                $name = time().'.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+                $source = storage_path().'/app/public/images/'. $name;                
+                \Image::make($image)->fit(340, 340)->save($source);
+                $data[] = $name;
+            }
+            $note->image = json_encode($data); 
+        } 
         $note->save();
     }
 

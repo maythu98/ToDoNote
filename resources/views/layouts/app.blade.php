@@ -21,6 +21,51 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/our_style.css') }}" rel="stylesheet">
+    <style>
+        .noteImage {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .image {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            height: 10%;
+            width: 10%;
+            opacity: 0;
+            transition: .3s ease;
+            border-radius: 5%;
+            background-color: black;
+        }
+
+        .noteImage:hover .overlay {
+            opacity: 1;
+        }
+
+        .icon {
+            color: white;
+            font-size: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .fa-trash:hover {
+            color: #eee;
+        }
+    </style>
 </head>
 <body>
     <div id="app">

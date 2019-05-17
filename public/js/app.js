@@ -1856,6 +1856,34 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -1867,7 +1895,8 @@ __webpack_require__.r(__webpack_exports__);
       editNote: [],
       note_id: '',
       images: [],
-      files: []
+      files: [],
+      file: ''
     };
   },
   methods: {
@@ -1885,7 +1914,6 @@ __webpack_require__.r(__webpack_exports__);
         _this.notes = response.data;
       });
     },
-    // Image
     onFileChange: function onFileChange(e) {
       var files = e.target.files || e.dataTransfer.files;
       if (!files.length) return;
@@ -1912,6 +1940,7 @@ __webpack_require__.r(__webpack_exports__);
         _this2.showall();
 
         _this2.images = [];
+        _this2.formDetail = false;
         _this2.$refs.NoteTitle.value = "";
         _this2.$refs.NoteContent.value = "";
       });
@@ -1920,6 +1949,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       axios.get('/editshow/' + id).then(function (response) {
+        response.data.image = JSON.parse(response.data.image);
         _this3.editNote = response.data;
       });
     },
@@ -1928,15 +1958,13 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.post('/updateNote/' + id, {
         title: this.$refs.UpdateTitle.value,
-        note: this.$refs.UpdateNote.value
+        note: this.$refs.UpdateNote.value,
+        images: this.images
       }).then(function (response) {
         _this4.editNote = [];
 
         _this4.showall();
       });
-    },
-    fileUpload: function fileUpload() {
-      console.log('image');
     },
     noteOver: function noteOver(id) {
       this.note_id = id;
@@ -38078,13 +38106,21 @@ var render = function() {
               }
             ]
           },
-          _vm._l(_vm.images, function(image) {
-            return _c("img", {
-              staticClass: "img-fluid pb-2",
-              attrs: { name: _vm.files, src: image }
-            })
-          }),
-          0
+          [
+            _vm._l(_vm.images, function(image) {
+              return _c("div", { staticClass: "noteImage" }, [
+                _c("img", {
+                  staticClass: "img-fluid image",
+                  attrs: { src: image, alt: "" }
+                }),
+                _vm._v(" "),
+                _vm._m(0, true)
+              ])
+            }),
+            _vm._v(" "),
+            _c("br")
+          ],
+          2
         ),
         _vm._v(" "),
         _c("div", { staticClass: "form-group" }, [
@@ -38132,6 +38168,7 @@ var render = function() {
           [
             _c("input", {
               attrs: { type: "file" },
+              domProps: { value: _vm.file },
               on: { change: _vm.onFileChange }
             })
           ]
@@ -38245,6 +38282,34 @@ var render = function() {
           [
             _c("div", { staticClass: "modal-content" }, [
               _c("div", { staticClass: "modal-body" }, [
+                _c(
+                  "div",
+                  { staticClass: "form-group" },
+                  _vm._l(_vm.editNote.image, function(image) {
+                    return _c("div", { staticClass: "noteImage" }, [
+                      _c("img", {
+                        staticClass: "img-fluid image",
+                        attrs: { src: "storage/images/" + image, alt: "" }
+                      }),
+                      _vm._v(" "),
+                      _vm._m(1, true)
+                    ])
+                  }),
+                  0
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "form-group" },
+                  _vm._l(_vm.images, function(image) {
+                    return _c("img", {
+                      staticClass: "img-fluid pb-2",
+                      attrs: { name: _vm.files, src: image }
+                    })
+                  }),
+                  0
+                ),
+                _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
                   _c("input", {
                     ref: "UpdateTitle",
@@ -38269,6 +38334,13 @@ var render = function() {
                       "aria-label": "note"
                     },
                     domProps: { value: _vm.editNote.note }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("input", {
+                    attrs: { type: "file" },
+                    on: { change: _vm.onFileChange }
                   })
                 ])
               ]),
@@ -38295,7 +38367,38 @@ var render = function() {
     )
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "overlay" }, [
+      _c(
+        "a",
+        {
+          staticClass: "icon bottom-right",
+          attrs: { href: "#", title: "Delete Image" }
+        },
+        [_c("i", { staticClass: "fa fa-trash" })]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "overlay" }, [
+      _c(
+        "a",
+        {
+          staticClass: "icon bottom-right",
+          attrs: { href: "#", title: "Delete Image" }
+        },
+        [_c("i", { staticClass: "fa fa-trash" })]
+      )
+    ])
+  }
+]
 render._withStripped = true
 
 
