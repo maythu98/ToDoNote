@@ -7,9 +7,9 @@
 					<div class="noteImage" v-for="image in images">
 						<img :src="image" alt="" class="img-fluid image">
 						<div class="overlay">
-							<a href="#" class="icon bottom-right" title="Delete Image">
+							<div href="#" class="icon bottom-right" title="Delete Image" @click="removePreview(image)">
 								<i class="fa fa-trash"></i>
-							</a>
+							</div>
 						</div>
 					</div>
 					<br>
@@ -22,7 +22,7 @@
 					placeholder="Take a note ..."></textarea>
 				</div>
 				<div v-show="formDetail">
-					<input type="file" :value="file" v-on:change="onFileChange">
+					<input type="file" :value="filevalue" v-on:change="onFileChange">
 				</div>
 				<div v-show="formDetail" class="form-group pt-3">
 					<button @click="SaveNote" class="btn btn-secondary margin-left"> Save </button>
@@ -46,41 +46,48 @@
 
 		<!-- Modal -->
 		<div class="modal fade" :id="'form'+ this.note_id" tabindex="-1" role="dialog" aria-labelledby="edifForm" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered" role="document">
-			<div class="modal-content">
-			<div class="modal-body">
-				<div class="form-group">
-					<!-- <div class="wrapper" v-for="image in editNote.image">
-						<img :src="'storage/images/' + image" alt="" class="img-fluid">
-						<i class="fas fa-trash bottom-right"></i>
-					</div>	 -->
-					<div class="noteImage" v-for="image in editNote.image">
-						<img :src="'storage/images/' + image" alt="" class="img-fluid image">
-						<div class="overlay">
-							<a href="#" class="icon bottom-right" title="Delete Image">
-								<i class="fa fa-trash"></i>
-							</a>
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+				<div class="modal-body">
+					<div class="form-group">
+						<!-- <div class="wrapper" v-for="image in editNote.image">
+							<img :src="'storage/images/' + image" alt="" class="img-fluid">
+							<i class="fas fa-trash bottom-right"></i>
+						</div>	 -->
+						<div class="noteImage" v-for="image in editNote.image">
+							<img :src="'storage/images/' + image" alt="" class="img-fluid image">
+							<div class="overlay">
+								<a href="#" class="icon bottom-right" title="Delete Image" @click="removeImage(editNote.id, image)">
+									<i class="fa fa-trash"></i>
+								</a>
+							</div>
 						</div>
 					</div>
+					<div class="form-group">
+						<div class="noteImage" v-for="image in images">
+							<img :src="image" :name="files" alt="" class="img-fluid image">
+							<div class="overlay">
+								<div href="#" class="icon bottom-right" title="Delete Image" @click="removePreview(image)">
+									<i class="fa fa-trash"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<input type="text" ref="UpdateTitle" name="title" :value="editNote.title" class="form-control" placeholder="Title">
+					</div>
+					<div class="form-group">
+						<textarea type="text" ref="UpdateNote" rows="5" name="note" aria-label="note" class="form-control" :value="editNote.note">	</textarea>
+					</div>
+					<div class="form-group">
+						<input type="file" :value="filevalue" v-on:change="onFileChange">
+					</div>
 				</div>
-				<div class="form-group">
-					<img v-for="image in images" :name="files" :src="image" class="img-fluid pb-2">
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal" @click="noteUpdate(editNote.id)">Close</button>
 				</div>
-				<div class="form-group">
-					<input type="text" ref="UpdateTitle" name="title" :value="editNote.title" class="form-control" placeholder="Title">
-				</div>
-				<div class="form-group">
-					<textarea type="text" ref="UpdateNote" rows="5" name="note" aria-label="note" class="form-control" :value="editNote.note">	</textarea>
-				</div>
-				<div class="form-group">
-					<input type="file" v-on:change="onFileChange">
 				</div>
 			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal" @click="noteUpdate(editNote.id)">Close</button>
-			</div>
-			</div>
-		</div>
 		</div>
 	</div>
 </template>
@@ -97,7 +104,7 @@ import { log } from 'util';
 				note_id: '',
 				images:[],
 				files: [],
-				file: ''
+				filevalue: ''
 			}
 		},
 		methods: {
@@ -114,19 +121,25 @@ import { log } from 'util';
 				});				
 			},
 			onFileChange(e) {
-                let files = e.target.files || e.dataTransfer.files;
+				let files = e.target.files || e.dataTransfer.files;
                 if (!files.length)
-                    return;
-                this.createImage(files[0]);
+					return;
+				this.createImage(files[0]);
+                
             },
             createImage(file) {
-                let reader = new FileReader();
+				let reader = new FileReader();
                 let vm = this;
                 reader.onload = (e) => {
                     vm.images.push(e.target.result);
                 };
                 reader.readAsDataURL(file);
-            },
+			},
+			removePreview(image) {
+				this.images = this.images.filter(function(item){
+					return item !== image;
+				})
+			},
             SaveNote() {
 				axios.post('/store', {
 					title: this.$refs.NoteTitle.value,
@@ -141,6 +154,7 @@ import { log } from 'util';
 				})
 			},
 			noteEdit(id) {
+				this.editNote = [];
 				axios.get('/editshow/' + id).then(response=> {
 					response.data.image = JSON.parse(response.data.image);
 					this.editNote = response.data;
@@ -153,16 +167,23 @@ import { log } from 'util';
 					images: this.images,
 				}).then(response=> {
 					this.editNote = [];
+					this.images = [];
 					this.showall();
 				})
+			},
+			removeImage(id, image) {
+				axios.post('/removeImage/'+ id + '/' + image).then(response=> {
+					response.data.image = JSON.parse(response.data.image);
+					this.editNote = response.data;
+					this.showall();
+				});
 			},
 			noteOver(id) {
 				this.note_id = id;
 			},
 			noteLeave() {
 				this.note_id = '';
-			},
-
+			}
 		},
 
 		mounted() {

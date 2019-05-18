@@ -52,7 +52,11 @@ class NoteController extends Controller
         $note = Note::findOrFail($id);
         $note->title = $request->title;
         $note->note = $request->note;
+        
         if ($request->get('images')) {
+            if (isset($note->image)) {
+                $data = json_decode($note->image);
+            }
             foreach ($request->get('images') as $image) {
                 $name = time().'.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
                 $source = storage_path().'/app/public/images/'. $name;                
@@ -62,6 +66,16 @@ class NoteController extends Controller
             $note->image = json_encode($data); 
         } 
         $note->save();
+    }
+
+    public function removeImage($id, $image) 
+    {
+        $note = Note::findOrFail($id);
+        $images = json_decode($note->image);
+        $remainingImages = array_diff($images, array($image));
+        $note->image = json_encode($remainingImages);
+        $note->save();
+        return $note;
     }
 
 }

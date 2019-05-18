@@ -21,7 +21,6 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/our_style.css') }}" rel="stylesheet">
     <style>
         .noteImage {
             position: relative;

@@ -23,4 +23,5 @@ Route::post('/store', 'NoteController@store');
 Route::get('/show', 'NoteController@showall');
 Route::get('/editshow/{id}', 'NoteController@editshow');
 Route::post('/updateNote/{id}', 'NoteController@updateNote');
+Route::post('/removeImage/{id}/{image}', 'NoteController@removeImage');
 

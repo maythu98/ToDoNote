@@ -1884,6 +1884,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -1896,7 +1903,7 @@ __webpack_require__.r(__webpack_exports__);
       note_id: '',
       images: [],
       files: [],
-      file: ''
+      filevalue: ''
     };
   },
   methods: {
@@ -1929,6 +1936,11 @@ __webpack_require__.r(__webpack_exports__);
 
       reader.readAsDataURL(file);
     },
+    removePreview: function removePreview(image) {
+      this.images = this.images.filter(function (item) {
+        return item !== image;
+      });
+    },
     SaveNote: function SaveNote() {
       var _this2 = this;
 
@@ -1948,6 +1960,7 @@ __webpack_require__.r(__webpack_exports__);
     noteEdit: function noteEdit(id) {
       var _this3 = this;
 
+      this.editNote = [];
       axios.get('/editshow/' + id).then(function (response) {
         response.data.image = JSON.parse(response.data.image);
         _this3.editNote = response.data;
@@ -1962,8 +1975,19 @@ __webpack_require__.r(__webpack_exports__);
         images: this.images
       }).then(function (response) {
         _this4.editNote = [];
+        _this4.images = [];
 
         _this4.showall();
+      });
+    },
+    removeImage: function removeImage(id, image) {
+      var _this5 = this;
+
+      axios.post('/removeImage/' + id + '/' + image).then(function (response) {
+        response.data.image = JSON.parse(response.data.image);
+        _this5.editNote = response.data;
+
+        _this5.showall();
       });
     },
     noteOver: function noteOver(id) {
@@ -38114,7 +38138,21 @@ var render = function() {
                   attrs: { src: image, alt: "" }
                 }),
                 _vm._v(" "),
-                _vm._m(0, true)
+                _c("div", { staticClass: "overlay" }, [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "icon bottom-right",
+                      attrs: { href: "#", title: "Delete Image" },
+                      on: {
+                        click: function($event) {
+                          return _vm.removePreview(image)
+                        }
+                      }
+                    },
+                    [_c("i", { staticClass: "fa fa-trash" })]
+                  )
+                ])
               ])
             }),
             _vm._v(" "),
@@ -38168,7 +38206,7 @@ var render = function() {
           [
             _c("input", {
               attrs: { type: "file" },
-              domProps: { value: _vm.file },
+              domProps: { value: _vm.filevalue },
               on: { change: _vm.onFileChange }
             })
           ]
@@ -38292,7 +38330,21 @@ var render = function() {
                         attrs: { src: "storage/images/" + image, alt: "" }
                       }),
                       _vm._v(" "),
-                      _vm._m(1, true)
+                      _c("div", { staticClass: "overlay" }, [
+                        _c(
+                          "a",
+                          {
+                            staticClass: "icon bottom-right",
+                            attrs: { href: "#", title: "Delete Image" },
+                            on: {
+                              click: function($event) {
+                                return _vm.removeImage(_vm.editNote.id, image)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fa fa-trash" })]
+                        )
+                      ])
                     ])
                   }),
                   0
@@ -38302,10 +38354,28 @@ var render = function() {
                   "div",
                   { staticClass: "form-group" },
                   _vm._l(_vm.images, function(image) {
-                    return _c("img", {
-                      staticClass: "img-fluid pb-2",
-                      attrs: { name: _vm.files, src: image }
-                    })
+                    return _c("div", { staticClass: "noteImage" }, [
+                      _c("img", {
+                        staticClass: "img-fluid image",
+                        attrs: { src: image, name: _vm.files, alt: "" }
+                      }),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "overlay" }, [
+                        _c(
+                          "div",
+                          {
+                            staticClass: "icon bottom-right",
+                            attrs: { href: "#", title: "Delete Image" },
+                            on: {
+                              click: function($event) {
+                                return _vm.removePreview(image)
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "fa fa-trash" })]
+                        )
+                      ])
+                    ])
                   }),
                   0
                 ),
@@ -38340,6 +38410,7 @@ var render = function() {
                 _c("div", { staticClass: "form-group" }, [
                   _c("input", {
                     attrs: { type: "file" },
+                    domProps: { value: _vm.filevalue },
                     on: { change: _vm.onFileChange }
                   })
                 ])
@@ -38367,38 +38438,7 @@ var render = function() {
     )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "overlay" }, [
-      _c(
-        "a",
-        {
-          staticClass: "icon bottom-right",
-          attrs: { href: "#", title: "Delete Image" }
-        },
-        [_c("i", { staticClass: "fa fa-trash" })]
-      )
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "overlay" }, [
-      _c(
-        "a",
-        {
-          staticClass: "icon bottom-right",
-          attrs: { href: "#", title: "Delete Image" }
-        },
-        [_c("i", { staticClass: "fa fa-trash" })]
-      )
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
