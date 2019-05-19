@@ -71,9 +71,15 @@ class NoteController extends Controller
     public function removeImage($id, $image) 
     {
         $note = Note::findOrFail($id);
+
         $images = json_decode($note->image);
-        $remainingImages = array_diff($images, array($image));
-        $note->image = json_encode($remainingImages);
+
+        // $remainingImages = array_diff($images, array($image));
+        if (($key = array_search($image, $images)) !== false) {
+            array_splice($images, $key, 1);
+        }
+        // dd($images);
+        $note->image = json_encode($images);
         $note->save();
         return $note;
     }

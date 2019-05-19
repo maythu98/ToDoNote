@@ -1891,6 +1891,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -1936,6 +1938,10 @@ __webpack_require__.r(__webpack_exports__);
 
       reader.readAsDataURL(file);
     },
+    // PreviewImage() {
+    //     var selectedfile = URL.createObjectURL(this.$refs.InputFile.files[0]);
+    //     this.SelectedImages.push(selectedfile);
+    // },
     removePreview: function removePreview(image) {
       this.images = this.images.filter(function (item) {
         return item !== image;
@@ -1960,7 +1966,7 @@ __webpack_require__.r(__webpack_exports__);
     noteEdit: function noteEdit(id) {
       var _this3 = this;
 
-      this.editNote = [];
+      // this.editNote = [];
       axios.get('/editshow/' + id).then(function (response) {
         response.data.image = JSON.parse(response.data.image);
         _this3.editNote = response.data;
@@ -38205,7 +38211,7 @@ var render = function() {
           },
           [
             _c("input", {
-              attrs: { type: "file" },
+              attrs: { type: "file", accept: "image/*" },
               domProps: { value: _vm.filevalue },
               on: { change: _vm.onFileChange }
             })
@@ -38387,7 +38393,8 @@ var render = function() {
                     attrs: {
                       type: "text",
                       name: "title",
-                      placeholder: "Title"
+                      placeholder: "Title",
+                      accept: "image/*"
                     },
                     domProps: { value: _vm.editNote.title }
                   })
@@ -38409,7 +38416,7 @@ var render = function() {
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
                   _c("input", {
-                    attrs: { type: "file" },
+                    attrs: { type: "file", accept: "image/*" },
                     domProps: { value: _vm.filevalue },
                     on: { change: _vm.onFileChange }
                   })

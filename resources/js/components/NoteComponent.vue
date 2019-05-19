@@ -22,7 +22,8 @@
 					placeholder="Take a note ..."></textarea>
 				</div>
 				<div v-show="formDetail">
-					<input type="file" :value="filevalue" v-on:change="onFileChange">
+					<input type="file" :value="filevalue" v-on:change="onFileChange" accept="image/*">
+					<!-- <input ref="InputFile" type="file" @change="PreviewImage()">  -->
 				</div>
 				<div v-show="formDetail" class="form-group pt-3">
 					<button @click="SaveNote" class="btn btn-secondary margin-left"> Save </button>
@@ -74,13 +75,14 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<input type="text" ref="UpdateTitle" name="title" :value="editNote.title" class="form-control" placeholder="Title">
+						<input type="text" ref="UpdateTitle" name="title" :value="editNote.title" class="form-control" placeholder="Title" accept="image/*">
 					</div>
 					<div class="form-group">
 						<textarea type="text" ref="UpdateNote" rows="5" name="note" aria-label="note" class="form-control" :value="editNote.note">	</textarea>
 					</div>
 					<div class="form-group">
-						<input type="file" :value="filevalue" v-on:change="onFileChange">
+						<input type="file" :value="filevalue" v-on:change="onFileChange" accept="image/*">
+						<!-- <input ref="InputFile" type="file" @change="PreviewImage()"> -->
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -135,6 +137,10 @@ import { log } from 'util';
                 };
                 reader.readAsDataURL(file);
 			},
+			// PreviewImage() {
+            //     var selectedfile = URL.createObjectURL(this.$refs.InputFile.files[0]);
+            //     this.SelectedImages.push(selectedfile);
+            // },
 			removePreview(image) {
 				this.images = this.images.filter(function(item){
 					return item !== image;
@@ -154,7 +160,7 @@ import { log } from 'util';
 				})
 			},
 			noteEdit(id) {
-				this.editNote = [];
+				// this.editNote = [];
 				axios.get('/editshow/' + id).then(response=> {
 					response.data.image = JSON.parse(response.data.image);
 					this.editNote = response.data;
